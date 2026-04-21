@@ -2,6 +2,18 @@
   "expo": {
     "name": "Ruvera",
     "slug": "Ruvera",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "scheme": "ruvera",
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }
