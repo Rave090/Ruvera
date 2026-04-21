@@ -1,25 +1,22 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Typography } from '@components/Typography';
-import { ScreenWrapper } from '@components/ScreenWrapper';
-import { lightTheme } from '@theme';
+import React, { useState } from 'react';
+import DetectionCameraScreen from '@features/detection/screens/DetectionCameraScreen';
+import DetectionAnalyzingScreen from '@features/detection/screens/DetectionAnalyzingScreen';
+import DetectionResultsScreen from '@features/detection/screens/DetectionResultsScreen';
 
-const { colors, spacing } = lightTheme;
+type Phase = 'camera' | 'analyzing' | 'results';
 
-export default function DetectionScreen() {
-  return (
-    <ScreenWrapper backgroundColor={colors.background}>
-      <View style={styles.container}>
-        <Typography variant="h3" weight="semibold">Skin Scan</Typography>
-        <Typography variant="body" color="textSecondary" style={styles.sub}>
-          On-device AI detection — coming in Phase 4
-        </Typography>
-      </View>
-    </ScreenWrapper>
-  );
+export default function DetectionRoute() {
+  const [phase, setPhase] = useState<Phase>('camera');
+  const handleCapture = (_uri: string) => {
+    // _uri available for backend ML pipeline integration
+    setPhase('analyzing');
+  };
+
+  if (phase === 'analyzing') {
+    return <DetectionAnalyzingScreen onDone={() => setPhase('results')} />;
+  }
+  if (phase === 'results') {
+    return <DetectionResultsScreen onRescan={() => setPhase('camera')} />;
+  }
+  return <DetectionCameraScreen onCapture={handleCapture} />;
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: spacing.sm },
-  sub: { marginTop: spacing.xs },
-});

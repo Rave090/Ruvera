@@ -30,4 +30,3 @@ const styles = StyleSheet.create({
     gap: lightTheme.spacing.sm,
   },
 });
-,
