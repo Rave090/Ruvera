@@ -8,6 +8,14 @@ export type ProductCategory =
   | 'eye-care'
   | 'mask';
 
+export interface ProductReview {
+  id: string;
+  authorName: string;
+  rating: number;
+  text: string;
+  date: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -25,6 +33,13 @@ export interface Product {
   isBestSeller: boolean;
   inStock: boolean;
   tags: string[];
+  badge?: string;
+  volume?: string;
+  skinType?: string;
+  ingredients?: string;
+  themeColor?: string;
+  accentColor?: string;
+  reviews?: ProductReview[];
 }
 
 export interface ProductFilters {

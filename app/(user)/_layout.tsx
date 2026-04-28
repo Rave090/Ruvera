@@ -34,6 +34,7 @@ export default function UserLayout() {
       />
       <Tabs.Screen name="orders" options={{ href: null }} />
       <Tabs.Screen name="order/[id]" options={{ href: null }} />
+      <Tabs.Screen name="order-confirmed" options={{ href: null }} />
       <Tabs.Screen name="chat-room/[id]" options={{ href: null }} />
     </Tabs>
   );
