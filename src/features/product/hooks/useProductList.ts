@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchProducts } from '../services/product.service';
-import type { Product, ProductListParams } from '../types';
+import type { Product, ProductListParams, ProductFilters } from '../types';
 import type { PaginatedResponse } from '@services/api/types';
 
 interface UseProductListResult {
@@ -23,6 +23,13 @@ export function useProductList(params: ProductListParams = {}): UseProductListRe
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const query = params.query;
+  const category = params.filters?.category;
+  const minPrice = params.filters?.minPrice;
+  const maxPrice = params.filters?.maxPrice;
+  const minRating = params.filters?.minRating;
+  const inStockOnly = params.filters?.inStockOnly;
+
   const load = useCallback(
     async (pageNum: number, append: boolean) => {
       if (append) {
@@ -32,7 +39,18 @@ export function useProductList(params: ProductListParams = {}): UseProductListRe
         setError(null);
       }
 
-      const result = await fetchProducts({ ...params, page: pageNum });
+      const hasFilters =
+        category !== undefined ||
+        minPrice !== undefined ||
+        maxPrice !== undefined ||
+        minRating !== undefined ||
+        inStockOnly !== undefined;
+
+      const filters: ProductFilters | undefined = hasFilters
+        ? { category, minPrice, maxPrice, minRating, inStockOnly }
+        : undefined;
+
+      const result = await fetchProducts({ query, filters, page: pageNum });
 
       if (result.success) {
         const res: PaginatedResponse<Product> = result.data;
@@ -44,11 +62,13 @@ export function useProductList(params: ProductListParams = {}): UseProductListRe
         setError(result.error.message);
       }
 
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (append) {
+        setIsLoadingMore(false);
+      } else {
+        setIsLoading(false);
+      }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [params.query, params.filters?.category],
+    [query, category, minPrice, maxPrice, minRating, inStockOnly],
   );
 
   useEffect(() => {

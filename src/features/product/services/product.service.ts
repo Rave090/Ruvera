@@ -33,7 +33,6 @@ const MOCK_REVIEWS: Record<string, ProductReview[]> = {
   ],
 };
 
-// TODO: replace with API call to GET /api/v1/products
 const MOCK_PRODUCTS: Product[] = [
   {
     id: 'p1',
@@ -195,7 +194,6 @@ const MOCK_PRODUCTS: Product[] = [
   },
 ];
 
-// TODO: replace with API call to GET /api/v1/products
 export async function fetchProducts(
   params: ProductListParams = {},
 ): Promise<Result<PaginatedResponse<Product>>> {
@@ -245,7 +243,6 @@ export async function fetchProducts(
   };
 }
 
-// TODO: replace with API call to GET /api/v1/products/:id
 export async function fetchProductById(id: string): Promise<Result<Product>> {
   await delay(400);
   const product = MOCK_PRODUCTS.find(p => p.id === id);
@@ -258,13 +255,11 @@ export async function fetchProductById(id: string): Promise<Result<Product>> {
   return { success: true, data: product };
 }
 
-// TODO: replace with API call to GET /api/v1/products?trending=true
 export async function fetchTrendingProducts(): Promise<Result<Product[]>> {
   await delay(500);
   return { success: true, data: MOCK_PRODUCTS.filter(p => p.isTrending) };
 }
 
-// TODO: replace with API call to GET /api/v1/products?bestSeller=true
 export async function fetchBestSellers(): Promise<Result<Product[]>> {
   await delay(500);
   return { success: true, data: MOCK_PRODUCTS.filter(p => p.isBestSeller) };

@@ -21,7 +21,6 @@ import { lightTheme } from '@theme';
 
 const { colors, spacing, borderRadius, shadows } = lightTheme;
 const BRAND = '#5C2B3E';
-const HERO_MID = '#8C3D58';
 const HERO_LIGHT = 'rgba(196, 96, 138, 0.5)';
 const PRODUCT_BG = ['#2A1208', '#160A20'] as const;
 
@@ -54,15 +53,27 @@ export default function HomeScreen() {
   const curated =
     products.length >= 2
       ? products.map((p, i) => ({
-          brand: (p.brand ?? 'SKINCARE').toUpperCase(),
+          id: p.id,
+          brand: p.brand.toUpperCase(),
           name: p.name,
-          price: `NPR ${Math.round(p.price).toLocaleString()}`,
+          price: `${p.currency} ${Math.round(p.price).toLocaleString()}`,
           imgBg: PRODUCT_BG[i],
+          badges: p.badges,
+          isFavourited: p.isFavourited,
         }))
       : [
-          { brand: 'BOTANY LUXE', name: 'Aura Dew Serum', price: 'NPR 4,200', imgBg: PRODUCT_BG[0] },
-          { brand: 'SKIN RITUALS', name: 'Moonlight Balm', price: 'NPR 3,850', imgBg: PRODUCT_BG[1] },
+          { id: '1', brand: 'BOTANY LUXE', name: 'Aura Dew Serum', price: 'NPR 4,200', imgBg: PRODUCT_BG[0], badges: [] as string[], isFavourited: false },
+          { id: '2', brand: 'SKIN RITUALS', name: 'Moonlight Balm', price: 'NPR 3,850', imgBg: PRODUCT_BG[1], badges: [] as string[], isFavourited: false },
         ];
+
+  const analysis = data?.analysis ?? null;
+  const routine = data?.routine ?? null;
+  const morningSteps = routine?.morning.length ?? 0;
+  const eveningSteps = routine?.evening.length ?? 0;
+  const remainingSteps = morningSteps + eveningSteps;
+  const hydrationText = analysis
+    ? `${analysis.hydrationScore}% ${analysis.hydrationLabel}`
+    : 'Scan to begin';
 
   const heroH = Math.min(width * 0.72, 280);
 
@@ -155,7 +166,7 @@ export default function HomeScreen() {
           {/* Hydration pill — bottom right */}
           <View style={styles.hydroPill}>
             <Ionicons name="water-outline" size={12} color="rgba(255,255,255,0.9)" />
-            <Typography style={styles.hydroText}>88% Hydrated</Typography>
+            <Typography style={styles.hydroText}>{hydrationText}</Typography>
           </View>
         </Animated.View>
 
@@ -198,7 +209,7 @@ export default function HomeScreen() {
                 Today's Ritual
               </Typography>
               <Typography variant="caption" color="textSecondary">
-                2 STEPS REMAINING
+                {remainingSteps > 0 ? `${remainingSteps} STEPS REMAINING` : 'ALL DONE'}
               </Typography>
             </View>
             <View style={styles.cardRow}>

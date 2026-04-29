@@ -4,10 +4,33 @@ import axios, {
   InternalAxiosRequestConfig,
   AxiosResponse,
 } from 'axios';
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import type { ApiError, Result } from './types';
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'https://api.ruvera.app/v1';
+const BASE_URL = (() => {
+  if (!__DEV__) {
+    return process.env.EXPO_PUBLIC_API_BASE_URL ?? 'https://api.ruvera.app/v1';
+  }
+
+  const envUrl = process.env.EXPO_PUBLIC_API_BASE_URL ?? '';
+  if (envUrl && !envUrl.includes('localhost')) {
+    return envUrl;
+  }
+
+  // In Expo Go on a physical device, debuggerHost is the Metro bundler address
+  // ("192.168.x.x:8081"). The API server lives on the same machine, so we
+  // reuse that LAN IP instead of localhost (which resolves to the device itself).
+  const metroHost = Constants.expoGoConfig?.debuggerHost?.split(':')[0];
+  if (metroHost && metroHost !== 'localhost' && metroHost !== '127.0.0.1') {
+    return `http://${metroHost}:8080/api/v1`;
+  }
+
+  // Android emulator: 10.0.2.2 is the alias for the host machine.
+  const loopback = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+  return `http://${loopback}:8080/api/v1`;
+})();
 const REQUEST_TIMEOUT = 15_000;
 const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY = 500;
@@ -34,12 +57,15 @@ async function refreshAccessToken(): Promise<string | null> {
   if (!refreshToken) return null;
 
   try {
-    const response = await axios.post<{ accessToken: string }>(
+    const response = await axios.post<{ accessToken: string; refreshToken: string }>(
       `${BASE_URL}/auth/refresh`,
       { refreshToken },
     );
-    const newToken = response.data.accessToken;
-    await SecureStore.setItemAsync(SECURE_STORE_KEYS.accessToken, newToken);
+    const { accessToken: newToken, refreshToken: newRefreshToken } = response.data;
+    await Promise.all([
+      SecureStore.setItemAsync(SECURE_STORE_KEYS.accessToken, newToken),
+      SecureStore.setItemAsync(SECURE_STORE_KEYS.refreshToken, newRefreshToken),
+    ]);
     return newToken;
   } catch {
     await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.accessToken);

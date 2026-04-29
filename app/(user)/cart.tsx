@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useShallow } from 'zustand/react/shallow';
 import { Typography } from '@components/Typography';
 import { Button } from '@components/Button';
 import { lightTheme } from '@theme';
@@ -128,7 +129,7 @@ function EmptyCart({ onShop }: { onShop: () => void }): React.ReactElement {
 export default function CartScreen(): React.ReactElement {
   const router = useRouter();
   const items = useCartStore(selectCartItems);
-  const summary = useCartStore(selectCartSummary);
+  const summary = useCartStore(useShallow(selectCartSummary));
   const updateQuantity = useCartStore(s => s.updateQuantity);
   const removeItem = useCartStore(s => s.removeItem);
   const clearCart = useCartStore(s => s.clearCart);

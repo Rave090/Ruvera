@@ -20,8 +20,6 @@ import type { Product, ProductReview } from '@features/product/types';
 
 const { colors, spacing } = lightTheme;
 
-const ROSE = '#5C2B3E';
-const ROSE_LIGHT = '#F5E8EA';
 const SUCCESS_GREEN = '#4caf7d';
 
 type DetailTab = 'about' | 'ingredients' | 'reviews';
@@ -53,7 +51,7 @@ function CartButton({
       accessibilityRole="button"
       accessibilityLabel={`Cart, ${count} items`}
     >
-      <Ionicons name="bag-outline" size={18} color={ROSE} />
+      <Ionicons name="bag-outline" size={18} color={colors.primary} />
       {count > 0 && (
         <View style={styles.cartBadge}>
           <Typography variant="overline" style={styles.cartBadgeText}>
@@ -83,7 +81,7 @@ function QuantitySelector({
         accessibilityLabel="Decrease quantity"
         disabled={value <= 1}
       >
-        <Typography variant="subheading" weight="bold" style={{ color: ROSE, lineHeight: 22 }}>
+        <Typography variant="subheading" weight="bold" style={styles.qtyMinus}>
           −
         </Typography>
       </Pressable>
@@ -96,7 +94,7 @@ function QuantitySelector({
         accessibilityRole="button"
         accessibilityLabel="Increase quantity"
       >
-        <Typography variant="subheading" weight="bold" style={{ color: '#fff', lineHeight: 22 }}>
+        <Typography variant="subheading" weight="bold" style={styles.qtyPlus}>
           +
         </Typography>
       </Pressable>
@@ -148,9 +146,7 @@ function AboutTab({ product }: { product: Product }): React.ReactElement {
 }
 
 function IngredientsTab({ product }: { product: Product }): React.ReactElement {
-  const keyActives = (product.ingredients ?? '')
-    .split(', ')
-    .slice(1, 5);
+  const keyActives = (product.ingredients ?? '').split(', ').slice(1, 5);
 
   return (
     <View>
@@ -164,9 +160,7 @@ function IngredientsTab({ product }: { product: Product }): React.ReactElement {
           </Typography>
           {keyActives.map(ing => (
             <View key={ing} style={styles.activeRow}>
-              <View
-                style={[styles.activeDot, { backgroundColor: product.accentColor ?? ROSE }]}
-              />
+              <View style={[styles.activeDot, { backgroundColor: product.accentColor ?? colors.primary }]} />
               <Typography variant="bodySmall" color="textPrimary" weight="medium">
                 {ing.trim()}
               </Typography>
@@ -209,7 +203,7 @@ function ReviewsTab({ product }: { product: Product }): React.ReactElement {
   }
 
   return (
-    <View style={{ gap: 12 }}>
+    <View style={styles.reviewsList}>
       {reviews.map(r => (
         <ReviewCard key={r.id} review={r} />
       ))}
@@ -217,7 +211,13 @@ function ReviewsTab({ product }: { product: Product }): React.ReactElement {
   );
 }
 
-function ProductDetail({ product }: { product: Product }): React.ReactElement {
+function ProductDetail({
+  product,
+  onBack,
+}: {
+  product: Product;
+  onBack: () => void;
+}): React.ReactElement {
   const router = useRouter();
   const [qty, setQty] = useState(1);
   const [activeTab, setActiveTab] = useState<DetailTab>('about');
@@ -243,39 +243,29 @@ function ProductDetail({ product }: { product: Product }): React.ReactElement {
 
   return (
     <View style={styles.root}>
-      {/* Hero Section */}
       <View
-        style={[
-          styles.hero,
-          { backgroundColor: product.themeColor ?? colors.surfaceSecondary },
-        ]}
+        style={[styles.hero, { backgroundColor: product.themeColor ?? colors.surfaceSecondary }]}
       >
-        {/* Nav overlay */}
         <View style={styles.heroNav}>
-          <BackButton onPress={() => router.back()} />
+          <BackButton onPress={onBack} />
           <CartButton count={cartCount} onPress={() => router.push('/(user)/cart')} />
         </View>
 
-        {/* Large bottle */}
         <View style={styles.heroBottle}>
           <ProductBottle category={product.category} accentColor={product.accentColor} size="lg" />
         </View>
 
-        {/* Tags */}
         {product.tags.length > 0 && (
           <View style={styles.heroTags}>
             {product.tags.map(tag => (
               <View
                 key={tag}
-                style={[
-                  styles.heroTag,
-                  { borderColor: `${product.accentColor ?? ROSE}22` },
-                ]}
+                style={[styles.heroTag, { borderColor: `${product.accentColor ?? colors.primary}22` }]}
               >
                 <Typography
                   variant="caption"
                   weight="semibold"
-                  style={{ color: product.accentColor ?? ROSE }}
+                  style={{ color: product.accentColor ?? colors.primary }}
                 >
                   {tag}
                 </Typography>
@@ -285,17 +275,15 @@ function ProductDetail({ product }: { product: Product }): React.ReactElement {
         )}
       </View>
 
-      {/* Info Panel */}
       <ScrollView
         style={styles.infoPanel}
         contentContainerStyle={styles.infoPanelContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Brand + Name */}
         <View style={styles.nameLine}>
           <Typography
             variant="overline"
-            style={[styles.detailBrandLabel, { color: product.accentColor ?? ROSE }]}
+            style={[styles.detailBrandLabel, { color: product.accentColor ?? colors.primary }]}
           >
             {product.brand} · {product.volume ?? ''}
           </Typography>
@@ -304,7 +292,6 @@ function ProductDetail({ product }: { product: Product }): React.ReactElement {
           </Typography>
         </View>
 
-        {/* Rating Row */}
         <View style={styles.ratingRow}>
           <StarRating rating={product.rating} size={13} />
           <Typography variant="bodySmall" weight="semibold" color="textPrimary">
@@ -322,7 +309,6 @@ function ProductDetail({ product }: { product: Product }): React.ReactElement {
           )}
         </View>
 
-        {/* Price + Qty */}
         <View style={styles.priceQtyRow}>
           <View>
             <Typography variant="h2" weight="bold" color="textPrimary" style={styles.bigPrice}>
@@ -341,17 +327,15 @@ function ProductDetail({ product }: { product: Product }): React.ReactElement {
           />
         </View>
 
-        {/* Skin Match */}
         {product.skinType && (
           <View style={styles.skinMatchBadge}>
-            <Ionicons name="checkmark-circle" size={15} color={ROSE} />
-            <Typography variant="caption" weight="semibold" style={{ color: ROSE }}>
+            <Ionicons name="checkmark-circle" size={15} color={colors.primary} />
+            <Typography variant="caption" weight="semibold" style={styles.skinMatchText}>
               Matched for {product.skinType}
             </Typography>
           </View>
         )}
 
-        {/* Tabs */}
         <TabBar active={activeTab} onChange={setActiveTab} />
 
         {activeTab === 'about' && <AboutTab product={product} />}
@@ -359,7 +343,6 @@ function ProductDetail({ product }: { product: Product }): React.ReactElement {
         {activeTab === 'reviews' && <ReviewsTab product={product} />}
       </ScrollView>
 
-      {/* Bottom CTA */}
       <View style={styles.cta}>
         <Button
           variant={justAdded ? 'primary' : 'outline'}
@@ -382,12 +365,21 @@ function ProductDetail({ product }: { product: Product }): React.ReactElement {
 
 export default function ProductDetailScreen(): React.ReactElement {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const { product, isLoading, error } = useProductDetail(id ?? '');
+
+  const handleBack = useCallback(() => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(user)/products');
+    }
+  }, [router]);
 
   if (isLoading) {
     return (
       <SafeAreaView style={styles.center} edges={['top']}>
-        <ActivityIndicator size="large" color={ROSE} />
+        <ActivityIndicator size="large" color={colors.primary} />
       </SafeAreaView>
     );
   }
@@ -395,6 +387,9 @@ export default function ProductDetailScreen(): React.ReactElement {
   if (error || !product) {
     return (
       <SafeAreaView style={styles.center} edges={['top']}>
+        <Pressable onPress={handleBack} style={styles.errorBackBtn} accessibilityRole="button" accessibilityLabel="Go back">
+          <Ionicons name="arrow-back" size={18} color={colors.textPrimary} />
+        </Pressable>
         <Typography variant="body" color="error" align="center">
           {error ?? 'Product not found'}
         </Typography>
@@ -402,7 +397,7 @@ export default function ProductDetailScreen(): React.ReactElement {
     );
   }
 
-  return <ProductDetail product={product} />;
+  return <ProductDetail product={product} onBack={handleBack} />;
 }
 
 const styles = StyleSheet.create({
@@ -415,6 +410,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.background,
+  },
+  errorBackBtn: {
+    position: 'absolute',
+    top: spacing.lg,
+    left: spacing.lg,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   hero: {
     paddingTop: 56,
@@ -451,7 +457,7 @@ const styles = StyleSheet.create({
     minWidth: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: ROSE,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 2,
@@ -526,7 +532,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   discountPillText: {
-    color: '#4caf7d',
+    color: SUCCESS_GREEN,
     fontWeight: '600',
     fontSize: 11,
   },
@@ -553,12 +559,20 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: ROSE_LIGHT,
+    backgroundColor: colors.surfaceSecondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   qtyBtnActive: {
-    backgroundColor: ROSE,
+    backgroundColor: colors.primary,
+  },
+  qtyMinus: {
+    color: colors.primary,
+    lineHeight: 22,
+  },
+  qtyPlus: {
+    color: '#fff',
+    lineHeight: 22,
   },
   qtyValue: {
     minWidth: 20,
@@ -569,11 +583,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: ROSE_LIGHT,
+    backgroundColor: colors.surfaceSecondary,
     borderRadius: 14,
     paddingHorizontal: spacing.lg,
     paddingVertical: 10,
     marginBottom: spacing.lg,
+  },
+  skinMatchText: {
+    color: colors.primary,
   },
   tabBar: {
     flexDirection: 'row',
@@ -589,7 +606,7 @@ const styles = StyleSheet.create({
     marginBottom: -2,
   },
   tabItemActive: {
-    borderBottomColor: ROSE,
+    borderBottomColor: colors.primary,
   },
   tabLabel: {
     color: colors.textSecondary,
@@ -597,7 +614,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   tabLabelActive: {
-    color: ROSE,
+    color: colors.primary,
   },
   aboutText: {
     lineHeight: 26,
@@ -607,7 +624,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   keyActivesCard: {
-    backgroundColor: '#faf8fb',
+    backgroundColor: colors.background,
     borderRadius: 16,
     padding: spacing.lg,
     gap: 8,
@@ -628,8 +645,11 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     flexShrink: 0,
   },
+  reviewsList: {
+    gap: 12,
+  },
   reviewCard: {
-    backgroundColor: '#faf8fb',
+    backgroundColor: colors.background,
     borderRadius: 18,
     padding: spacing.lg,
     gap: 6,
@@ -655,15 +675,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     borderTopWidth: 1,
-    borderTopColor: '#f0eaf4',
+    borderTopColor: colors.border,
   },
   ctaAdd: {
     flex: 1,
-    borderColor: `${ROSE}30`,
+    borderColor: `${colors.primary}30`,
   },
   ctaBuy: {
     flex: 1.4,
-    shadowColor: ROSE,
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 14,

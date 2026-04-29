@@ -1,17 +1,24 @@
 import { Database } from '@nozbe/watermelondb';
 import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
 import { schema } from './schema';
+import { migrations } from './migrations';
 import { User } from './models/User';
+import { HomeProduct } from './models/HomeProduct';
+import { SkinAnalysisCache } from './models/SkinAnalysisCache';
+import { RoutineStep } from './models/RoutineStep';
+import { HomeDermatologist } from './models/HomeDermatologist';
+import { Banner } from './models/Banner';
+import { HomeMeta } from './models/HomeMeta';
 
-// NOTE: This database instance requires a native development build.
-// It will NOT work in Expo Go — use `npx expo run:ios` or `npx expo run:android`.
+// NOTE: Requires a native development build — NOT compatible with Expo Go.
+// jsi: false — the JSI native module is not compiled in the current binary.
+// Enable jsi: true only after confirming WatermelonDB JSI is linked (rebuild + pod install).
 const adapter = new SQLiteAdapter({
   schema,
+  migrations,
   dbName: 'ruvera',
-  jsi: true,
+  jsi: false,
   onSetUpError: (error) => {
-    // Surface setup failures visibly during development.
-    // Replace with a crash-reporting call in production.
     if (__DEV__) {
       console.error('[WatermelonDB] Setup error:', error);
     }
@@ -20,5 +27,13 @@ const adapter = new SQLiteAdapter({
 
 export const database = new Database({
   adapter,
-  modelClasses: [User],
+  modelClasses: [
+    User,
+    HomeProduct,
+    SkinAnalysisCache,
+    RoutineStep,
+    HomeDermatologist,
+    Banner,
+    HomeMeta,
+  ],
 });
