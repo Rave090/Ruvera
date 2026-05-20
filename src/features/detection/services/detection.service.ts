@@ -4,12 +4,13 @@ import { skinAnalyzer } from '@ml/skinAnalysis/analyzer';
 import { processRawOutput } from '@ml/skinAnalysis/resultProcessor';
 import { scanForSensitiveImageData } from '@utils/privacyUtils';
 import type { FaceDetectionResult } from '@ml/faceDetection/types';
-import type { SkinAnalysisResult, SkinAnalysisInput } from '@ml/skinAnalysis/types';
+import type { RawMLOutput, SkinAnalysisResult, SkinAnalysisInput } from '@ml/skinAnalysis/types';
 import type { Result } from '@services/api/types';
 
 export interface DetectionPipelineOutput {
   face: FaceDetectionResult;
   analysis: SkinAnalysisResult;
+  raw: RawMLOutput;
 }
 
 /**
@@ -96,5 +97,5 @@ export async function runDetectionPipeline(
 
   const analysis = processRawOutput(rawOutput);
 
-  return { success: true, data: { face, analysis } };
+  return { success: true, data: { face, analysis, raw: rawOutput } };
 }

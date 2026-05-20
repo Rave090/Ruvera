@@ -26,6 +26,17 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "android": {
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.Ruvera"
+    },
+    "ios": {
+      "bundleIdentifier": "com.anonymous.Ruvera",
+      "appleTeamId": "TM4F2CU59D"
     }
   }
 }

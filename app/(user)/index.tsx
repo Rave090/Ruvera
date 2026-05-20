@@ -262,7 +262,7 @@ export default function HomeScreen() {
                 variant="ghost"
                 size="sm"
                 label="View Boutique"
-                onPress={() => router.push('/(user)/detection' as never)}
+                onPress={() => router.push('/(user)/products')}
               />
             </View>
             <View style={styles.cardRow}>
@@ -273,7 +273,12 @@ export default function HomeScreen() {
                     styles.productCard,
                     pressed && { opacity: 0.88 },
                   ]}
-                  onPress={() => {}}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/(user)/product/[id]',
+                      params: { id: item.id },
+                    })
+                  }
                   accessibilityRole="button"
                   accessibilityLabel={`${item.name}, ${item.price}`}
                 >

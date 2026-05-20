@@ -1,4 +1,4 @@
-package com.ruvera
+package com.anonymous.Ruvera
 
 import android.app.Application
 import android.content.res.Configuration

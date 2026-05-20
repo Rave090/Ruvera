@@ -6,7 +6,8 @@ export type ProductCategory =
   | 'toner'
   | 'treatment'
   | 'eye-care'
-  | 'mask';
+  | 'mask'
+  | 'other';
 
 export interface ProductReview {
   id: string;
@@ -33,12 +34,13 @@ export interface Product {
   isBestSeller: boolean;
   inStock: boolean;
   tags: string[];
-  badge?: string;
+  badge?: string | null;
   volume?: string;
   skinType?: string;
   ingredients?: string;
   themeColor?: string;
   accentColor?: string;
+  isFavourited: boolean;
   reviews?: ProductReview[];
 }
 

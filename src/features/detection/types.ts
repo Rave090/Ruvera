@@ -59,3 +59,44 @@ export interface SkinRecommendation {
   eveningRoutine: SkincareRoutineStep[];
   generatedAt: string;
 }
+
+// ─── Backend API shapes ──────────────────────────────────────────────────────
+
+export interface SkinAnalysisApiResult {
+  id: string;
+  analysedAt: string;
+  hydrationScore: number;
+  hydrationLabel: string;
+  overallHealthScore: number;
+  skinType: string;
+  concerns: string[];
+  hasActiveAnalysis: boolean;
+}
+
+export interface RoutineStep {
+  order: number;
+  productCategory: string;
+  instruction: string;
+  productName: string | null;
+  productId: string | null;
+}
+
+export interface SkinRoutineApiResult {
+  analysisId: string;
+  morning: RoutineStep[];
+  evening: RoutineStep[];
+  generatedAt: string;
+}
+
+export interface SubmitAnalysisBody {
+  skinType: string;
+  concerns: string[];
+  oiliness: number;
+  hydration: number;
+  sensitivity: number;
+  acneScore: number;
+  pigmentation: number;
+  wrinkleScore: number;
+  confidence: number;
+  analysedAt: string;
+}

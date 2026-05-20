@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchProducts } from '../services/product.service';
+import { useProductStore } from '@store/product.store';
 import type { Product, ProductListParams, ProductFilters } from '../types';
 import type { PaginatedResponse } from '@services/api/types';
 
@@ -22,6 +23,8 @@ export function useProductList(params: ProductListParams = {}): UseProductListRe
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const setFavoriteIds = useProductStore(s => s.setFavoriteIds);
 
   const query = params.query;
   const category = params.filters?.category;
@@ -54,7 +57,15 @@ export function useProductList(params: ProductListParams = {}): UseProductListRe
 
       if (result.success) {
         const res: PaginatedResponse<Product> = result.data;
-        setProducts(prev => (append ? [...prev, ...res.data] : res.data));
+        const incoming = res.data;
+
+        setProducts(prev => {
+          const next = append ? [...prev, ...incoming] : incoming;
+          const favIds = next.filter(p => p.isFavourited).map(p => p.id);
+          setFavoriteIds(favIds);
+          return next;
+        });
+
         setTotal(res.total);
         setHasNextPage(res.hasNextPage);
         setPage(pageNum);
@@ -68,7 +79,7 @@ export function useProductList(params: ProductListParams = {}): UseProductListRe
         setIsLoading(false);
       }
     },
-    [query, category, minPrice, maxPrice, minRating, inStockOnly],
+    [query, category, minPrice, maxPrice, minRating, inStockOnly, setFavoriteIds],
   );
 
   useEffect(() => {

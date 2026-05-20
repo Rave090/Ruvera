@@ -1,5 +1,6 @@
 import { apiClient, apiRequest } from '@services/api/client';
 import type { Result } from '@services/api/types';
+import type { Product } from '@features/product/types';
 import type {
   HomeData,
   HomeProductItem,
@@ -7,7 +8,6 @@ import type {
   TodaysRoutine,
   Dermatologist,
   PromoBanner,
-  ApiProductsResponse,
   ApiDermatologistsResponse,
   ApiBannersResponse,
   ApiNotificationCountResponse,
@@ -24,24 +24,41 @@ import {
   writeLastFetchTimestamp,
 } from './home.repository';
 
+function toHomeProductItem(p: Product): HomeProductItem {
+  return {
+    id: p.id,
+    name: p.name,
+    brand: p.brand,
+    category: p.category,
+    price: p.price,
+    currency: '₹',
+    rating: p.rating,
+    reviewCount: p.reviewCount,
+    imageUrl: p.imageUrl,
+    badges: p.badge ? [p.badge] : [],
+    inStock: p.inStock,
+    isFavourited: p.isFavourited,
+  };
+}
+
 // ── Individual fetchers ───────────────────────────────────────────────────
 
 async function fetchTrendingProducts(): Promise<HomeProductItem[]> {
   const result = await apiRequest(() =>
-    apiClient.get<ApiProductsResponse>('/products/trending?page=1&pageSize=6'),
+    apiClient.get<Product[]>('/products/trending'),
   );
   if (!result.success) return [];
-  const products = result.data.data;
+  const products = result.data.map(toHomeProductItem);
   await writeHomeProducts('trending', products);
   return products;
 }
 
 async function fetchBestSellers(): Promise<HomeProductItem[]> {
   const result = await apiRequest(() =>
-    apiClient.get<ApiProductsResponse>('/products/best-sellers?page=1&pageSize=6'),
+    apiClient.get<Product[]>('/products/bestsellers'),
   );
   if (!result.success) return [];
-  const products = result.data.data;
+  const products = result.data.map(toHomeProductItem);
   await writeHomeProducts('best_sellers', products);
   return products;
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Pressable, Animated, StyleSheet, StatusBar, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import type { CameraType, FlashMode } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
@@ -31,7 +32,15 @@ export default function DetectionCameraScreen({ onCapture }: Props) {
   const [flash, setFlash] = useState<FlashMode>('off');
   const [aligned, setAligned] = useState(false);
   const [capturing, setCapturing] = useState(false);
+  const [isFocused, setIsFocused] = useState(true);
   const cameraRef = useRef<CameraView>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsFocused(true);
+      return () => setIsFocused(false);
+    }, []),
+  );
   const pulseScale = useRef(new Animated.Value(1)).current;
   const pulseOpacity = useRef(new Animated.Value(0.8)).current;
   const scanLineY = useRef(new Animated.Value(0)).current;
@@ -136,12 +145,14 @@ export default function DetectionCameraScreen({ onCapture }: Props) {
     <View style={styles.root}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
 
-      <CameraView
-        ref={cameraRef}
-        style={StyleSheet.absoluteFill}
-        facing={facing}
-        flash={flash}
-      />
+      {isFocused && (
+        <CameraView
+          ref={cameraRef}
+          style={StyleSheet.absoluteFill}
+          facing={facing}
+          flash={flash}
+        />
+      )}
 
       {/* Top bar */}
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
